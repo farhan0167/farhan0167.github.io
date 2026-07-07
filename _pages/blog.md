@@ -8,7 +8,7 @@ pagination:
   enabled: true
   collection: posts
   permalink: /page/:num/
-  per_page: 5
+  per_page: 6
   sort_field: date
   sort_reverse: true
   trail:
@@ -16,181 +16,151 @@ pagination:
     after: 3 # The number of links after the current page
 ---
 
-<div class="post">
+<div class="post editorial-blog">
 
-{% assign blog_name_size = site.blog_name | size %}
-{% assign blog_description_size = site.blog_description | size %}
-
-{% if blog_name_size > 0 or blog_description_size > 0 %}
-
-  <div class="header-bar">
-    <h1>{{ site.blog_name }}</h1>
-    <h2>{{ site.blog_description }}</h2>
+  {% comment %} ---------- Editorial header ---------- {% endcomment %}
+  {% assign blog_name_size = site.blog_name | size %}
+  {% assign blog_description_size = site.blog_description | size %}
+  {% if blog_name_size > 0 or blog_description_size > 0 %}
+  <div class="editorial-header">
+    <h1 class="editorial-title">{{ site.blog_name }}</h1>
+    {% if blog_description_size > 0 %}
+      <p class="editorial-tagline">{{ site.blog_description }}</p>
+    {% endif %}
   </div>
   {% endif %}
 
-{% if site.display_tags and site.display_tags.size > 0 or site.display_categories and site.display_categories.size > 0 %}
+  {% comment %} ---------- Featured row: hero (left) + secondary (right) ---------- {% endcomment %}
+  {% assign featured_posts = site.posts | where: "featured", "true" %}
+  {% if featured_posts.size > 0 %}
+    {% assign hero = featured_posts | first %}
+    <div class="featured-row">
 
-  <div class="tag-category-list">
-    <ul class="p-0 m-0">
-      {% for tag in site.display_tags %}
-        <li>
-          <i class="fa-solid fa-hashtag fa-sm"></i> <a href="{{ tag | slugify | prepend: '/blog/tag/' | relative_url }}">{{ tag }}</a>
-        </li>
-        {% unless forloop.last %}
-          <p>&bull;</p>
-        {% endunless %}
-      {% endfor %}
-      {% if site.display_categories.size > 0 and site.display_tags.size > 0 %}
-        <p>&bull;</p>
-      {% endif %}
-      {% for category in site.display_categories %}
-        <li>
-          <i class="fa-solid fa-tag fa-sm"></i> <a href="{{ category | slugify | prepend: '/blog/category/' | relative_url }}">{{ category }}</a>
-        </li>
-        {% unless forloop.last %}
-          <p>&bull;</p>
-        {% endunless %}
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
+      <a class="feature-hero" href="{{ hero.url | relative_url }}">
+        {% if hero.thumbnail %}
+          <div class="feature-hero-img" style="background-image: url('{{ hero.thumbnail | relative_url }}');"></div>
+        {% endif %}
+        <div class="feature-hero-body">
+          {% if hero.categories.size > 0 %}
+            <span class="cat-pill">{{ hero.categories | first }}</span>
+          {% endif %}
+          <h2>{{ hero.title }}</h2>
+          <p class="feature-excerpt">{{ hero.description }}</p>
+          <p class="feature-meta">
+            {% if hero.author %}{{ hero.author }} &nbsp;&middot;&nbsp; {% endif %}{{ hero.date | date: '%b %-d, %Y' }}
+          </p>
+        </div>
+      </a>
 
-{% assign featured_posts = site.posts | where: "featured", "true" %}
-{% if featured_posts.size > 0 %}
-<br>
-
-<div class="container featured-posts">
-{% assign is_even = featured_posts.size | modulo: 2 %}
-<div class="row row-cols-{% if featured_posts.size <= 2 or is_even == 0 %}2{% else %}3{% endif %}">
-{% for post in featured_posts %}
-<div class="col mb-4">
-<a href="{{ post.url | relative_url }}">
-<div class="card hoverable">
-<div class="row g-0">
-<div class="col-md-12">
-<div class="card-body">
-<div class="float-right">
-<i class="fa-solid fa-thumbtack fa-xs"></i>
-</div>
-<h3 class="card-title text-lowercase">{{ post.title }}</h3>
-<p class="card-text">{{ post.description }}</p>
-
-                    {% if post.external_source == blank %}
-                      {% assign read_time = post.content | number_of_words | divided_by: 180 | plus: 1 %}
-                    {% else %}
-                      {% assign read_time = post.feed_content | strip_html | number_of_words | divided_by: 180 | plus: 1 %}
-                    {% endif %}
-                    {% assign year = post.date | date: "%Y" %}
-
-                    <p class="post-meta">
-                      {{ read_time }} min read &nbsp; &middot; &nbsp;
-                      <a href="{{ year | prepend: '/blog/' | relative_url }}">
-                        <i class="fa-solid fa-calendar fa-sm"></i> {{ year }} </a>
-                    </p>
-                  </div>
-                </div>
-              </div>
+      <div class="feature-secondary-col">
+        {% for post in featured_posts offset:1 limit:2 %}
+          <a class="feature-secondary" href="{{ post.url | relative_url }}">
+            {% if post.thumbnail %}
+              <div class="feature-secondary-img" style="background-image: url('{{ post.thumbnail | relative_url }}');"></div>
+            {% endif %}
+            <div class="feature-secondary-body">
+              {% if post.categories.size > 0 %}
+                <span class="cat-pill">{{ post.categories | first }}</span>
+              {% endif %}
+              <h3>{{ post.title }}</h3>
+              <p class="feature-excerpt">{{ post.description }}</p>
+              <p class="feature-meta">{{ post.date | date: '%b %-d, %Y' }}</p>
             </div>
           </a>
-        </div>
-      {% endfor %}
+        {% endfor %}
       </div>
+
     </div>
-    <hr>
+  {% endif %}
 
-{% endif %}
+  {% comment %} ---------- Latest list + sidebar ---------- {% endcomment %}
+  <h4 class="section-heading"># Latest</h4>
 
-  <ul class="post-list">
+  <div class="latest-layout">
 
-    {% if page.pagination.enabled %}
-      {% assign postlist = paginator.posts %}
-    {% else %}
-      {% assign postlist = site.posts %}
-    {% endif %}
-
-    {% for post in postlist %}
-
-    {% if post.external_source == blank %}
-      {% assign read_time = post.content | number_of_words | divided_by: 180 | plus: 1 %}
-    {% else %}
-      {% assign read_time = post.feed_content | strip_html | number_of_words | divided_by: 180 | plus: 1 %}
-    {% endif %}
-    {% assign year = post.date | date: "%Y" %}
-    {% assign tags = post.tags | join: "" %}
-    {% assign categories = post.categories | join: "" %}
-
-    <li>
-
-{% if post.thumbnail %}
-
-<div class="row">
-          <div class="col-sm-9">
-{% endif %}
-        <h3>
-        {% if post.redirect == blank %}
-          <a class="post-title" href="{{ post.url | relative_url }}">{{ post.title }}</a>
-        {% elsif post.redirect contains '://' %}
-          <a class="post-title" href="{{ post.redirect }}" target="_blank">{{ post.title }}</a>
-          <svg width="2rem" height="2rem" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 13.5v6H5v-12h6m3-3h6v6m0-6-9 9" class="icon_svg-stroke" stroke="#999" stroke-width="1.5" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg>
+    {% comment %} ----- main column: post cards ----- {% endcomment %}
+    <div class="latest-main">
+      <div class="post-cards">
+        {% if page.pagination.enabled %}
+          {% assign postlist = paginator.posts %}
         {% else %}
-          <a class="post-title" href="{{ post.redirect | relative_url }}">{{ post.title }}</a>
+          {% assign postlist = site.posts %}
         {% endif %}
-      </h3>
-      <p>{{ post.description }}</p>
-      <p class="post-meta">
-        {{ read_time }} min read &nbsp; &middot; &nbsp;
-        {{ post.date | date: '%B %d, %Y' }}
-        {% if post.external_source %}
-        &nbsp; &middot; &nbsp; {{ post.external_source }}
-        {% endif %}
-      </p>
-      <p class="post-tags">
-        <a href="{{ year | prepend: '/blog/' | relative_url }}">
-          <i class="fa-solid fa-calendar fa-sm"></i> {{ year }} </a>
 
-          {% if tags != "" %}
-          &nbsp; &middot; &nbsp;
-            {% for tag in post.tags %}
-            <a href="{{ tag | slugify | prepend: '/blog/tag/' | relative_url }}">
-              <i class="fa-solid fa-hashtag fa-sm"></i> {{ tag }}</a>
-              {% unless forloop.last %}
-                &nbsp;
-              {% endunless %}
-              {% endfor %}
+        {% for post in postlist %}
+          {% assign read_time = post.content | number_of_words | divided_by: 180 | plus: 1 %}
+          <a class="post-card" href="{{ post.url | relative_url }}">
+            {% if post.thumbnail %}
+              <div class="post-card-img" style="background-image: url('{{ post.thumbnail | relative_url }}');"></div>
+            {% endif %}
+            <div class="post-card-body">
+              {% if post.categories.size > 0 %}
+                <span class="cat-pill">{{ post.categories | first }}</span>
+              {% endif %}
+              <h3>{{ post.title }}</h3>
+              <p class="post-card-excerpt">{{ post.description }}</p>
+              <p class="post-card-meta">
+                {% if post.author %}{{ post.author }} &nbsp;&middot;&nbsp; {% endif %}
+                {{ post.date | date: '%b %-d, %Y' }} &nbsp;&middot;&nbsp; {{ read_time }} min read
+              </p>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+
+      {% if page.pagination.enabled %}
+        {% include pagination.liquid %}
+      {% endif %}
+    </div>
+
+    {% comment %} ----- sidebar ----- {% endcomment %}
+    <aside class="latest-sidebar">
+
+      {% comment %} Widget: What I'm building (from _data/code.yml) {% endcomment %}
+      {% assign code_sections = site.data.code.sections %}
+      {% if code_sections and code_sections.size > 0 %}
+        <div class="sidebar-widget">
+          <h5 class="widget-title">What I'm building</h5>
+          {% for section in code_sections %}
+            {% for project in section.projects limit: 3 %}
+              <a class="widget-project" href="{% if project.package_url %}{{ project.package_url }}{% elsif project.repo %}https://github.com/{{ project.repo }}{% else %}#{% endif %}"{% if project.package_url or project.repo %} target="_blank" rel="noopener"{% endif %}>
+                {% if project.package %}<span class="widget-project-name">{{ project.package }}</span>{% endif %}
+                <span class="widget-project-desc">{{ project.name }}</span>
+                {% if project.date %}<span class="widget-project-date">{{ project.date }}</span>{% endif %}
+              </a>
+            {% endfor %}
+          {% endfor %}
+          <a class="widget-more" href="{{ '/code/' | relative_url }}">All code &rarr;</a>
+        </div>
+      {% endif %}
+
+      {% comment %} Widget: Connect (from _data/socials.yml) {% endcomment %}
+      <div class="sidebar-widget">
+        <h5 class="widget-title">Connect</h5>
+        <div class="widget-socials">
+          {% if site.data.socials.github_username %}
+            <a href="https://github.com/{{ site.data.socials.github_username }}" target="_blank" rel="noopener" aria-label="GitHub">
+              <i class="fa-brands fa-github"></i> GitHub
+            </a>
           {% endif %}
-
-          {% if categories != "" %}
-          &nbsp; &middot; &nbsp;
-            {% for category in post.categories %}
-            <a href="{{ category | slugify | prepend: '/blog/category/' | relative_url }}">
-              <i class="fa-solid fa-tag fa-sm"></i> {{ category }}</a>
-              {% unless forloop.last %}
-                &nbsp;
-              {% endunless %}
-              {% endfor %}
+          {% if site.data.socials.linkedin_username %}
+            <a href="https://www.linkedin.com/in/{{ site.data.socials.linkedin_username }}" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <i class="fa-brands fa-linkedin"></i> LinkedIn
+            </a>
           {% endif %}
-    </p>
+          {% if site.data.socials.email %}
+            <a href="mailto:{{ site.data.socials.email }}" aria-label="Email">
+              <i class="fa-solid fa-envelope"></i> Email
+            </a>
+          {% endif %}
+          <a href="{{ '/feed.xml' | relative_url }}" aria-label="RSS feed">
+            <i class="fa-solid fa-rss"></i> RSS
+          </a>
+        </div>
+      </div>
 
-{% if post.thumbnail %}
+    </aside>
 
-</div>
-
-  <div class="col-sm-3">
-    <img class="card-img" src="{{ post.thumbnail | relative_url }}" style="object-fit: cover; height: 90%" alt="image">
   </div>
-</div>
-{% endif %}
-    </li>
-
-    {% endfor %}
-
-  </ul>
-
-{% if page.pagination.enabled %}
-{% include pagination.liquid %}
-{% endif %}
 
 </div>

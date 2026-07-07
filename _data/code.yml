@@ -1,0 +1,37 @@
+# Data for the /code/ page.
+# Group your projects into sections. Each section has a `title` and a list of `projects`.
+# Each project supports:
+#   date:    string shown in the Date column (e.g. "May, 2026")
+#   name:    the project title/description shown in the Project column
+#   package: (optional) display name of the package/link, e.g. "decaf"
+#   package_url: (optional) URL the package name links to (PyPI, npm, docs, homepage...)
+#   repo:    (optional) "owner/repo" on GitHub — renders a live Star button
+
+sections:
+  - title: personal projects
+    projects:
+      - date: "April, 2026 - Present"
+        name: Expiremental agent harness building kit
+        package: mini-agent-kit
+        package_url: https://pypi.org/project/mini-agent-kit/
+        repo: farhan0167/minimal-agent
+
+      - date: "May, 2026"
+        name: Cli tool equiped with Claude Skill to generate Resume/CV's
+        package: cv-claw
+        package_url: https://pypi.org/project/cv-claw/
+        repo: farhan0167/cv-claw
+
+      - date: "May, 2026"
+        name: "About An Obsedian style LLM Knowledge Base Platform inspired by Karpathy. Organize markdown files, and have an LLM index it. End result: query-able knowledge base."
+        package: wiki-view
+        package_url: https://github.com/farhan0167/wiki-viewer
+        repo: farhan0167/wiki-viewer
+
+  # - title: open source projects
+  #   projects:
+  #     - date: "Sep, 2023"
+  #       name: A playground for experimenting with diffusion models
+  #       package: diffusion-playground
+  #       package_url: https://pypi.org/project/diffusion-playground/
+  #       repo: farhan0167/diffusion-playground

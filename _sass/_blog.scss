@@ -165,3 +165,398 @@
     }
   }
 }
+
+/*******************************************************************************
+ * Editorial blog layout (featured hero + cards)
+ ******************************************************************************/
+
+.editorial-blog {
+  // Header
+  .editorial-header {
+    padding: 2rem 0 2.5rem;
+    border-bottom: 3px solid var(--global-text-color);
+    margin-bottom: 2.5rem;
+
+    .editorial-title {
+      font-weight: 800;
+      font-size: 4rem;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin: 0;
+      color: var(--global-text-color);
+
+      // underline the first letter, editorial style
+      &::first-letter {
+        border-bottom: 4px solid var(--global-theme-color);
+        padding-bottom: 2px;
+      }
+    }
+
+    .editorial-tagline {
+      margin: 1rem 0 0;
+      max-width: 34rem;
+      color: var(--global-text-color-light);
+      font-size: 1.05rem;
+    }
+  }
+
+  // Category pill
+  .cat-pill {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    padding: 0.3rem 0.55rem;
+    margin-bottom: 0.6rem;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 999px;
+    color: var(--global-text-color-light);
+    background-color: var(--global-card-bg-color);
+
+    &::before {
+      content: "\2022";
+      color: var(--global-theme-color);
+      margin-right: 0.3rem;
+    }
+  }
+
+  // Featured row
+  .featured-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  a.feature-hero,
+  a.feature-secondary,
+  a.post-card {
+    text-decoration: none;
+    color: var(--global-text-color);
+  }
+  a.feature-hero {
+    display: block;
+  }
+  // set display here so it wins over the anchor's default display:
+  // secondary cards stack image over text, post cards are rows (image left)
+  a.feature-secondary,
+  a.post-card {
+    display: flex;
+  }
+  a.feature-secondary {
+    flex-direction: column;
+  }
+
+  // Hero
+  .feature-hero {
+    .feature-hero-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background-size: cover;
+      background-position: center;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+    .feature-hero-body h2 {
+      font-weight: 700;
+      font-size: 1.9rem;
+      line-height: 1.15;
+      margin: 0.3rem 0 0.5rem;
+    }
+  }
+
+  // Secondary column
+  .feature-secondary-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+  .feature-secondary {
+    gap: 0.9rem;
+    .feature-secondary-img {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background-size: cover;
+      background-position: center;
+      border-radius: 10px;
+    }
+    .feature-secondary-body h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin: 0.2rem 0 0.4rem;
+    }
+    .feature-excerpt {
+      display: -webkit-box;
+      -webkit-line-clamp: 3; // keep the column from running long next to the hero
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  .feature-excerpt {
+    color: var(--global-text-color-light);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 0.6rem;
+  }
+  .feature-meta,
+  .post-card-meta {
+    color: var(--global-text-color-light);
+    font-size: 0.82rem;
+    margin: 0;
+  }
+
+  // Section heading (# Latest)
+  .section-heading {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--global-divider-color);
+    margin-bottom: 1.75rem;
+  }
+
+  // Latest cards
+  .post-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+  .post-card {
+    display: flex;
+    align-items: stretch;
+    gap: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--global-divider-color);
+    border-radius: 12px;
+    background-color: var(--global-card-bg-color);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      border-color: var(--global-theme-color);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
+
+      .post-card-body h3 {
+        color: var(--global-theme-color);
+      }
+    }
+
+    .post-card-img {
+      flex: 0 0 230px; // fixed-width image column, never wraps
+      aspect-ratio: 3 / 2;
+      align-self: flex-start;
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+    }
+    .post-card-body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; // keep the category pill at its natural width
+      flex: 1 1 auto; // take remaining space beside the fixed image
+      min-width: 0; // allow text column to shrink instead of overflowing the card
+      padding: 0 0.5rem 0 0;
+
+      .cat-pill {
+        margin-bottom: 0.7rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
+        margin: 0 0 0.45rem;
+        transition: color 0.15s ease;
+      }
+    }
+    .post-card-excerpt {
+      color: var(--global-text-color-light);
+      font-size: 0.92rem;
+      line-height: 1.55;
+      margin: 0 0 0.8rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; // keep cards a uniform height
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .post-card-meta {
+      font-size: 0.8rem;
+      letter-spacing: 0.01em;
+      margin-top: auto; // pin to the bottom so it aligns with the image's bottom edge
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+  }
+
+  // Latest: two-column layout (cards + sidebar)
+  .latest-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 2rem;
+    align-items: start;
+  }
+  .latest-main {
+    min-width: 0; // let post cards shrink instead of overflowing
+  }
+
+  // Sidebar
+  .latest-sidebar {
+    position: sticky;
+    top: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .sidebar-widget {
+    border: 1px solid var(--global-divider-color);
+    border-radius: 12px;
+    padding: 1.25rem;
+    background-color: var(--global-card-bg-color);
+
+    .widget-title {
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--global-text-color-light);
+      padding-bottom: 0.75rem;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--global-divider-color);
+    }
+  }
+
+  // "What I'm building" project links
+  .widget-project {
+    display: block;
+    text-decoration: none;
+    color: var(--global-text-color);
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--global-divider-color);
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+    &:hover .widget-project-name {
+      color: var(--global-theme-color);
+    }
+
+    .widget-project-name {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: color 0.15s ease;
+    }
+    .widget-project-desc {
+      display: block;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: var(--global-text-color-light);
+      margin-top: 0.15rem;
+    }
+    .widget-project-date {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--global-text-color-light);
+      margin-top: 0.25rem;
+      opacity: 0.8;
+    }
+  }
+  .widget-more {
+    display: inline-block;
+    margin-top: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--global-theme-color);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  // "Connect" social links
+  .widget-socials {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+
+    a {
+      color: var(--global-text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+
+      i {
+        width: 1.3rem;
+        text-align: center;
+        margin-right: 0.4rem;
+        color: var(--global-text-color-light);
+      }
+      &:hover {
+        color: var(--global-theme-color);
+        i {
+          color: var(--global-theme-color);
+        }
+      }
+    }
+  }
+
+}
+
+// Responsive (kept at top level so the @media wrapper compiles reliably)
+@media (max-width: 900px) {
+  .editorial-blog .latest-layout {
+    grid-template-columns: 1fr;
+  }
+  .editorial-blog .latest-sidebar {
+    position: static;
+    // show the sidebar widgets side-by-side on tablet before stacking
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .editorial-blog .sidebar-widget {
+    flex: 1 1 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .editorial-blog .editorial-header .editorial-title {
+    font-size: 2.6rem;
+  }
+  .editorial-blog .featured-row {
+    grid-template-columns: 1fr;
+  }
+  .editorial-blog .feature-secondary {
+    flex-direction: row;
+
+    .feature-secondary-img {
+      width: auto;
+      flex: 0 0 40%;
+      aspect-ratio: 4 / 3;
+      align-self: flex-start;
+    }
+  }
+  // stack card image on top when the row gets too narrow
+  .editorial-blog .post-card {
+    flex-direction: column;
+
+    .post-card-img {
+      flex: 0 0 auto;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 0;
+    }
+  }
+}
+
+// end of blog styles
+
