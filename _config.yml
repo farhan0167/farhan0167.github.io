@@ -134,6 +134,12 @@ external_sources:
     categories: [external-posts]
     tags: [medium]
 
+# Flickr photostream shown on /photos/ (fetched at build time by _plugins/flickr-photos.rb)
+flickr_feed:
+  rss_url: https://www.flickr.com/services/feeds/photos_public.gne?id=198698253@N07&format=rss2
+  profile_url: https://www.flickr.com/photos/198698253@N07/
+  tagline: "Captured moments from my travels and everyday walks."
+
 # -----------------------------------------------------------------------------
 # Newsletter
 # -----------------------------------------------------------------------------
