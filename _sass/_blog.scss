@@ -509,7 +509,6 @@
       }
     }
   }
-
 }
 
 // Responsive (kept at top level so the @media wrapper compiles reliably)
@@ -558,5 +557,41 @@
   }
 }
 
-// end of blog styles
+/*******************************************************************************
+ * Individual post page — typography matched to the editorial listing
+ ******************************************************************************/
 
+.post {
+  .post-header {
+    padding: 1.5rem 0 1.25rem;
+    border-bottom: 1px solid var(--global-divider-color);
+    margin-bottom: 2rem;
+
+    .post-title {
+      font-weight: 800;
+      font-size: 2.75rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  // covers article body headings and the ones the layout adds after it
+  // ("Enjoy Reading This Article?", "References")
+  h1:not(.post-title),
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}
+
+@media (max-width: 768px) {
+  .post .post-header .post-title {
+    font-size: 2rem;
+  }
+}
+
+// end of blog styles

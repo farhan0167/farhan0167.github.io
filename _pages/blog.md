@@ -18,10 +18,10 @@ pagination:
 
 <div class="post editorial-blog">
 
-  {% comment %} ---------- Editorial header ---------- {% endcomment %}
-  {% assign blog_name_size = site.blog_name | size %}
-  {% assign blog_description_size = site.blog_description | size %}
-  {% if blog_name_size > 0 or blog_description_size > 0 %}
+{% comment %} ---------- Editorial header ---------- {% endcomment %}
+{% assign blog_name_size = site.blog_name | size %}
+{% assign blog_description_size = site.blog_description | size %}
+{% if blog_name_size > 0 or blog_description_size > 0 %}
   <div class="editorial-header">
     <h1 class="editorial-title">{{ site.blog_name }}</h1>
     {% if blog_description_size > 0 %}
@@ -30,11 +30,11 @@ pagination:
   </div>
   {% endif %}
 
-  {% comment %} ---------- Featured row: hero (left) + secondary (right) ---------- {% endcomment %}
-  {% assign featured_posts = site.posts | where: "featured", "true" %}
-  {% if featured_posts.size > 0 %}
-    {% assign hero = featured_posts | first %}
-    <div class="featured-row">
+{% comment %} ---------- Featured row: hero (left) + secondary (right) ---------- {% endcomment %}
+{% assign featured_posts = site.posts | where: "featured", "true" %}
+{% if featured_posts.size > 0 %}
+{% assign hero = featured_posts | first %}
+<div class="featured-row">
 
       <a class="feature-hero" href="{% if hero.redirect contains '://' %}{{ hero.redirect }}{% else %}{{ hero.url | relative_url }}{% endif %}"{% if hero.redirect contains '://' %} target="_blank" rel="noopener"{% endif %}>
         {% if hero.thumbnail %}
@@ -71,9 +71,10 @@ pagination:
       </div>
 
     </div>
-  {% endif %}
 
-  {% comment %} ---------- Latest list + sidebar ---------- {% endcomment %}
+{% endif %}
+
+{% comment %} ---------- Latest list + sidebar ---------- {% endcomment %}
   <h4 class="section-heading"># Latest</h4>
 
   <div class="latest-layout">
