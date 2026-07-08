@@ -23,6 +23,13 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/code/";
           },
+        },{id: "nav-photography",
+          title: "photography",
+          description: "",
+          section: "Navigation",
+          handler: () => {
+            window.location.href = "/photos/";
+          },
         },{id: "post-building-a-minimal-agent-harness-from-scratch",
         
           title: "Building a minimal agent harness from scratch",
