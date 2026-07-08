@@ -36,7 +36,7 @@ pagination:
     {% assign hero = featured_posts | first %}
     <div class="featured-row">
 
-      <a class="feature-hero" href="{{ hero.url | relative_url }}">
+      <a class="feature-hero" href="{% if hero.redirect contains '://' %}{{ hero.redirect }}{% else %}{{ hero.url | relative_url }}{% endif %}"{% if hero.redirect contains '://' %} target="_blank" rel="noopener"{% endif %}>
         {% if hero.thumbnail %}
           <div class="feature-hero-img" style="background-image: url('{{ hero.thumbnail | relative_url }}');"></div>
         {% endif %}
@@ -54,7 +54,7 @@ pagination:
 
       <div class="feature-secondary-col">
         {% for post in featured_posts offset:1 limit:2 %}
-          <a class="feature-secondary" href="{{ post.url | relative_url }}">
+          <a class="feature-secondary" href="{% if post.redirect contains '://' %}{{ post.redirect }}{% else %}{{ post.url | relative_url }}{% endif %}"{% if post.redirect contains '://' %} target="_blank" rel="noopener"{% endif %}>
             {% if post.thumbnail %}
               <div class="feature-secondary-img" style="background-image: url('{{ post.thumbnail | relative_url }}');"></div>
             {% endif %}
@@ -89,7 +89,7 @@ pagination:
 
         {% for post in postlist %}
           {% assign read_time = post.content | number_of_words | divided_by: 180 | plus: 1 %}
-          <a class="post-card" href="{{ post.url | relative_url }}">
+          <a class="post-card" href="{% if post.redirect contains '://' %}{{ post.redirect }}{% else %}{{ post.url | relative_url }}{% endif %}"{% if post.redirect contains '://' %} target="_blank" rel="noopener"{% endif %}>
             {% if post.thumbnail %}
               <div class="post-card-img" style="background-image: url('{{ post.thumbnail | relative_url }}');"></div>
             {% endif %}

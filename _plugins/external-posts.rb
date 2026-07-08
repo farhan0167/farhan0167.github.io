@@ -67,6 +67,10 @@ module ExternalPosts
       doc.data['description'] = content[:summary]
       doc.data['date'] = content[:published]
       doc.data['redirect'] = url
+
+      # Use the first image in the feed content (e.g. Medium's hero image) as the card thumbnail
+      first_img = Nokogiri::HTML(content[:content].to_s).at('img')&.attr('src')
+      doc.data['thumbnail'] = first_img if first_img
       
       # Apply default categories and tags from source configuration
       if src['categories'] && src['categories'].is_a?(Array) && !src['categories'].empty?
