@@ -124,6 +124,177 @@
   }
 }
 
+// Notion-style floating table of contents (opt in with `toc: { minimap: true }`).
+// NB: the `toc.sidebar` key is reserved by al-folio's built-in bootstrap-toc sidebar,
+// so this uses its own `toc.minimap` key to avoid triggering both at once.
+// Sits in the right margin as a minimap of bars; expands to labelled links on hover.
+// Hidden entirely when the viewport is too narrow to clear the centered content column.
+.toc-floating {
+  display: none;
+}
+
+@media (min-width: 1080px) {
+  .toc-floating {
+    display: block;
+    position: fixed;
+    top: 50%;
+    right: 1.5rem;
+    transform: translateY(-50%);
+    z-index: 1000;
+  }
+
+  // Shared easing — a gentle decelerating curve so open/close feels soft, not snappy.
+  $toc-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  $toc-dur: 0.34s;
+
+  .toc-floating-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; // right-align the minimap bars
+    width: 3.2rem; // collapsed: just wide enough for the bars
+    max-height: 72vh;
+    overflow: hidden;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    // Width animates the whole panel open; overflow clips the labels until it does.
+    transition:
+      width $toc-dur $toc-ease,
+      background-color $toc-dur ease,
+      border-color $toc-dur ease,
+      box-shadow $toc-dur ease;
+
+    // jekyll-toc renders nested `<ul class="section-nav">`s
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    li {
+      margin: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    // Collapsed state: each link is a small bar (max-height clamps the text to a sliver
+    // so the vertical open can ease, unlike an un-tweenable `height: auto`).
+    a {
+      display: block;
+      max-height: 2px;
+      margin: 7px 0;
+      border-radius: 2px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-indent: -9999px;
+      text-decoration: none;
+      background: var(--global-divider-color);
+      transition:
+        max-height $toc-dur $toc-ease,
+        margin $toc-dur $toc-ease,
+        border-radius $toc-dur ease,
+        background-color $toc-dur ease,
+        color 0.2s ease;
+    }
+
+    // Bar length by heading level — tapering left, like a minimap
+    .toc-h1 > a,
+    .toc-h2 > a {
+      width: 22px;
+    }
+    .toc-h3 > a {
+      width: 15px;
+    }
+    .toc-h4 > a,
+    .toc-h5 > a,
+    .toc-h6 > a {
+      width: 10px;
+    }
+
+    a.active {
+      background: var(--global-theme-color);
+    }
+  }
+
+  .toc-floating-label {
+    align-self: flex-start;
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--global-text-color-light);
+    transition:
+      max-height $toc-dur $toc-ease,
+      margin-bottom $toc-dur $toc-ease,
+      opacity 0.24s ease;
+  }
+
+  // Hover: expand into a labelled panel that overlays the content
+  .toc-floating:hover {
+    .toc-floating-nav {
+      width: 16rem;
+      background: var(--global-bg-color);
+      border-color: var(--global-divider-color);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+      overflow-y: auto;
+
+      ul,
+      li {
+        align-items: stretch;
+      }
+
+      ul ul {
+        padding-left: 0.85rem;
+      }
+
+      a {
+        width: auto;
+        max-height: 4rem;
+        margin: 0.32rem 0;
+        padding: 0;
+        border-radius: 0;
+        text-indent: 0;
+        white-space: normal;
+        background: transparent;
+        font-size: 0.82rem;
+        line-height: 1.35;
+        // Fade the label text in slightly after the panel has begun opening.
+        color: var(--global-text-color-light);
+        transition:
+          max-height $toc-dur $toc-ease,
+          margin $toc-dur $toc-ease,
+          color 0.2s ease 0.08s;
+
+        &:hover {
+          color: var(--global-theme-color);
+        }
+
+        &.active {
+          background: transparent;
+          color: var(--global-theme-color);
+          font-weight: 600;
+        }
+      }
+    }
+
+    .toc-floating-label {
+      max-height: 2rem;
+      opacity: 1;
+      margin-bottom: 0.6rem;
+    }
+  }
+}
+
 .featured-posts {
   a {
     color: var(--global-text-color-light);

@@ -59,6 +59,15 @@ layout: default
     </p>
   </header>
 
+  {% if page.toc and page.toc.minimap %}
+    <aside class="toc-floating" aria-label="Table of contents">
+      <nav class="toc-floating-nav">
+        <span class="toc-floating-label">Contents</span>
+        {% toc %}
+      </nav>
+    </aside>
+  {% endif %}
+
   <article class="post-content">
     {% if page.toc and page.toc.beginning %}
       <div id="table-of-contents">
@@ -93,5 +102,39 @@ layout: default
   {% endif %}
   {% if site.giscus and page.giscus_comments %}
     {% include giscus.liquid %}
+  {% endif %}
+
+  {% if page.toc and page.toc.minimap %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const nav = document.querySelector('.toc-floating-nav');
+        if (!nav) return;
+        const links = Array.from(nav.querySelectorAll("a[href^='#']"));
+        const byId = new Map();
+        links.forEach(function (link) {
+          const id = decodeURIComponent(link.getAttribute('href').slice(1));
+          const target = document.getElementById(id);
+          if (target) byId.set(target, link);
+        });
+        if (byId.size === 0) return;
+        const observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (l) {
+                  l.classList.remove('active');
+                });
+                const active = byId.get(entry.target);
+                if (active) active.classList.add('active');
+              }
+            });
+          },
+          { rootMargin: '-66px 0px -70% 0px' }
+        );
+        byId.forEach(function (_, target) {
+          observer.observe(target);
+        });
+      });
+    </script>
   {% endif %}
 </div>
