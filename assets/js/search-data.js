@@ -30,48 +30,15 @@ ninja.data = [{
           handler: () => {
             window.location.href = "/photos/";
           },
-        },{id: "post-building-a-minimal-agent-harness-from-scratch",
+        },{id: "post-building-an-agent-harness-from-scratch-part-1",
         
-          title: "Building a minimal agent harness from scratch",
+          title: "Building an agent harness from scratch (Part 1)",
         
         description: "What I learned wiring up tool-calling, memory, and a control loop into a tiny, hackable agent kit.",
         section: "Posts",
         handler: () => {
           
             window.location.href = "/blog/2026/highlight-project/";
-          
-        },
-      },{id: "post-when-machines-begin-to-reason-over-knowledge",
-        
-          title: "When machines begin to reason over knowledge",
-        
-        description: "A shorter reflection piece — this is the secondary featured post shown beside the hero.",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2026/second-highlight/";
-          
-        },
-      },{id: "post-notes-on-shipping-small-tools",
-        
-          title: "Notes on shipping small tools",
-        
-        description: "A regular (non-featured) post. It shows up in the &quot;Latest&quot; list below the featured row as an image-left card.",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2026/first-post/";
-          
-        },
-      },{id: "post-the-weight-of-good-defaults",
-        
-          title: "The weight of good defaults",
-        
-        description: "Another post to fill out the Latest list so you can see the card layout with multiple entries.",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/blog/2026/second-post/";
           
         },
       },{id: "post-building-a-no-code-platform-and-the-bfs-algorithm",
