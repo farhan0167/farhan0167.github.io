@@ -67,7 +67,26 @@ blockquote {
     margin-bottom: 0;
   }
 
-  /* Tips, warnings, and dangers blockquotes */
+  /* Tips, notes, warnings, and dangers blockquotes */
+  &.block-tip,
+  &.block-note,
+  &.block-warning,
+  &.block-danger {
+    margin: 1em 0;
+    padding: 0.6em 0.9em;
+    font-size: 0.95rem;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-size: 1rem;
+      margin-bottom: 0.3em;
+    }
+  }
+
   &.block-tip {
     border-color: var(--global-tip-block);
     background-color: var(--global-tip-block-bg);
@@ -87,6 +106,28 @@ blockquote {
     h5,
     h6 {
       color: var(--global-tip-block-title);
+    }
+  }
+
+  &.block-note {
+    border-color: var(--global-note-block);
+    background-color: var(--global-note-block-bg);
+
+    em,
+    li,
+    p,
+    strong {
+      color: var(--global-note-block-text);
+    }
+
+    a,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: var(--global-note-block-title);
     }
   }
 
