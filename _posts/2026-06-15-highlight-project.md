@@ -43,7 +43,7 @@ while True:
     prompt = input("> ")
     messages.append({"role": "user", "content": prompt})
     llm_out = llm_call(messages)
-    messages.append(llm_out)
+    messages.append(llm_out.model_dump())
 ```
 
 We get a very simple chat application, and this is very straight forward. What we can then do is give our chat application a set of tools. And let's use the classic example for tools, getting the weather. Suppose we have some weather API that given a city would return the temperature.
@@ -97,7 +97,7 @@ while True:
     prompt = input("> ")
     messages.append({"role": "user", "content": prompt})
     llm_out = llm_call(messages)
-    messages.append(llm_out)
+    messages.append(llm_out.model_dump())
 
     if llm_out.tool_calls:
         for tool_call in llm_out.tool_calls:
@@ -109,7 +109,7 @@ while True:
                 "content": result
             })
         llm_out = llm_call(messages)
-        messages.append(llm_out)
+        messages.append(llm_out.model_dump())
 ```
 
 This way, when a user asks, "What is the weather in London?", the model returns a message with `tool_calls` which should have the keywords extracted, i.e London in this case. This way we can then run the `get_weather()` function, append a message back with the response of the API, and our LLM is now able to interact with the outside world.
@@ -145,7 +145,7 @@ while True:
     prompt = input("> ")
     messages.append({"role": "user", "content": prompt})
     llm_out = llm_call(messages)
-    messages.append(llm_out)
+    messages.append(llm_out.model_dump())
 
     if llm_out.tool_calls:
         for tool_call in llm_out.tool_calls:
@@ -157,7 +157,7 @@ while True:
                 "content": result
             })
         llm_out = llm_call(messages)
-        messages.append(llm_out)
+        messages.append(llm_out.model_dump())
 ```
 
 Even though we previously called this an agent loop, the key thing that is missing here, is the ability for the agent to finish a task. Here, we make one model call, which might decide to invoke a tool, call it and make one final model call. This is problematic because, reasoning and action can happen over many steps, and not just one. The other thing, we also want to do is add a layer of abstraction. Earlier we learnt that the way to interact with a LLM is to pass in a `messages` list, and we also see that, every model output including tool call and its invocation outputs are all appended back to the list. We'll give this a name: the **Context**. It's the abstraction for everything that goes into the model on each call/turn/step, and the agent's whole job is to grow and manage it. With these framings, the loop becomes:
@@ -174,11 +174,150 @@ We now have an outer loop, which is largely responsible for taking a user input,
 - Does it keep all past tool results or surgically keep the important ones.
 - And many more
 
-The important thing to understand is that an agent has agency and so does the designer of the system who dictates how the agent will interact with the environment. 
+The important thing to understand is that an agent has agency and so does the designer of the system who dictates how the agent will interact with the environment. With that being said, let's write some good, and update our naive loop.
+
+#### Context
+
+First, let's build out our simple Context object. It should be able to 1) add messages to some message store, and 2) should be able to get messages from the store. At the heart of it is a projection strategy which is responsible for assembling the system prompt and messages from the store.
+
+```python
+class Context:
+    def __init__(self, system_prompt: str):
+        self.system_prompt = system_prompt
+        self.messages: list = []
+    
+    def add(self, message):
+        self.messages.append(message)
+    
+    def get_messages(self):
+        return self.project().copy()
+
+    def project(self):
+        """The projection strategy: the messages the LLM should see.
+
+        Default: everything in the store. Override to implement a sliding
+        window, summarization, token-aware truncation, etc.
+        """
+        system_message = {"role": "system", "content": self.system_prompt}
+        return [system_message] + self.messages
+```
+
+You may rightfully ask as to why we created two seperate functions to get messages, and that's valid. We do this so that in the future, we have maximal flexibility as to what we display to the model. Consider the scenario where the number of tokens in the messages exceed the token budget of the model, in which case we may either want to apply some form of compaction strategy or apply some form of sliding window over the most recent messages. 
+
+This ties back to what I mentioned earlier about the agency of the designer of the system. As the designer, we should have the flexibility to choose what we show to the model, and it doesn't necessarily have to be exactly what the user asked. We can, in effect, inject environmental context about where the agent will operate in, or choose to offload all prior tool calling results in order to save the agent from hitting the model's token budget. Think about Claude Code, which has a system prompt that dictates how the system should behave, and then there are the Claude.md files, Memory.md files, Skills, etc it needs to assemble. These are things that can happen here in `project()` without altering the original list of messages.
+
+#### Tool Dispatch
+
+The next thing we should knock out is a mechanism to run the tools that the model chooses to call. We can keep this simple, and have a factory that runs a tool based on the name of the tool the model calls.
+
+```python
+def run_tool(tool_call):
+    name = tool_call.function.name
+    args = json.loads(tool_call.function.arguments)
+
+    if name == "get_weather":
+        result = get_weather(**args)
+    else:
+        result = f"Unknown tool: {name}"
+
+    return {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "content": result
+    }
+```
+
+#### Agent Loop
+
+And lastly, for the agent, we'll implement Algorithm 1 from before. The Agent will generally take an `LLM` instance, a system prompt, its tool list and we'll also specify a `max_turns` parameter to control how long the agent will run. Lastly, for the loop itself, we'll define a `run()` method that implements the algorithm itself.
+
+```python
+
+class Agent:
+    def __init__(self, llm, system_prompt, tools, max_turns=10):
+        self.llm = llm
+        self.context = Context(system_prompt)
+        self.tools = tools
+        self.max_turns = max_turns
+
+    def run(self, prompt):
+        self.context.add({"role": "user", "content": prompt})
+
+        for _ in range(self.max_turns):
+            llm_out = self.llm.call(self.context.get_messages(), self.tools)
+            self.context.add(llm_out.model_dump())
+
+            if llm_out.tool_calls:
+                for tool_call in llm_out.tool_calls:
+                    self.context.add(run_tool(tool_call))
+            else:
+                return llm_out.content
+```
+
+And since we previously established that the Agent and the LLM are to be two seperate entities, let's also codify the LLM class.
+
+```python
+
+class LLM:
+    def __init__(self, model="gpt5"):
+        self.client = OpenAI()
+        self.model = model
+
+    def call(self, messages, tools):
+        completion = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            tools=tools
+        )
+        return completion.choices[0].message
+```
+
+> **Note**
+>
+> One benefit of using the OpenAI client is that a lot of LLM providers expose a OpenAI compatible server, which generally lets you run their models on it.
+{: .block-note}
+
+#### Putting it all Together
+
+And lastly, we'll initialize our simple Agent, and run it.
+
+```python
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Get the current weather for a given city",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {
+                        "type": "string",
+                        "description": "The city to get the weather for"
+                    }
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+llm = LLM(model="gpt5")
+agent = Agent(
+    llm=llm,
+    system_prompt="You are a helpful assistant.", 
+    tools=tools
+)
+
+while True:
+    prompt = input("> ")
+    response = agent.run(prompt)
+    print(response)
+```
 
 
 
-## Harness: The Powerful Extras
+## Harness: Beyond the Loop
 
 this will eventually be filled out
 
